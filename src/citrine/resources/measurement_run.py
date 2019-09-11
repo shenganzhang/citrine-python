@@ -39,11 +39,11 @@ class MeasurementRun(DataConcepts, Resource['MeasurementRun'], TaurusMeasurement
     properties: List[Property], optional
         Properties that are measured during this measurement run.
     spec: MeasurementSpec
-        The measurement specification of which this is an instance.
+        The measurement specification of which this is a realization.
     material: MaterialRun
         The material run being measured.
-    spec: MaterialSpec
-        The material specification of which this is an instance.
+    spec: MeasurementSpec
+        The measurement specification of which this is a realization.
     file_links: List[FileLink], optional
         Links to associated files, with resource paths into the files API.
 

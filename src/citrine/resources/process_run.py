@@ -40,7 +40,7 @@ class ProcessRun(DataConcepts, Resource['ProcessRun'], TaurusProcessRun):
     ingredients: List[IngredientRun], optional
         Ingredient runs that act as inputs to this process run.
     spec: ProcessSpec
-        Spec for this process run.
+        The process specification of which this is a realization.
     file_links: List[FileLink], optional
         Links to associated files, with resource paths into the files API.
 

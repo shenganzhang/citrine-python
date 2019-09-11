@@ -34,13 +34,13 @@ class MaterialRun(DataConcepts, Resource['MaterialRun'], TaurusMaterialRun):
         A set of tags. Tags can be used for filtering.
     notes: str, optional
         Long-form notes about the material run.
-    process: ProcessSpec
+    process: ProcessRun
         Process that produces this material.
     sample_type: str, optional
         The form of this sample. Optionals are "experimental", "virtual", "production", or
         "unknown." Default is "unknown."
     spec: MaterialSpec
-        The material specification of which this is an instance.
+        The material specification of which this is a realization.
     file_links: List[FileLink], optional
         Links to associated files, with resource paths into the files API.
 
