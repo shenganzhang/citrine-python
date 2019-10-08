@@ -13,7 +13,7 @@ from citrine.resources.material_run import MaterialRun
 
 
 class ProjectDataFactory(factory.DictFactory):
-    uid = factory.Faker('uuid4')
+    id = factory.Faker('uuid4')
     name = factory.Faker('company')
     description = factory.Faker('catch_phrase')
     status = 'CREATED'

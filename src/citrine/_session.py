@@ -119,6 +119,10 @@ class Session(requests.Session):
         """Execute a POST request to a URL and utilize error filtering on the response."""
         return self.checked_request('POST', path, *args, json=json, **kwargs)
 
+    def checked_patch(self, path: str, json: dict, *args, **kwargs) -> dict:
+        """Execute a PATCH request to a URL and utilize error filtering on the response."""
+        return self.checked_request('PATCH', path, *args, json=json, **kwargs)
+
     def checked_put(self, path: str, json: dict, *args, **kwargs) -> None:
         """Execute a PUT request to a URL and utilize error filtering on the response."""
         return self.checked_request('PUT', path, *args, json=json, **kwargs)

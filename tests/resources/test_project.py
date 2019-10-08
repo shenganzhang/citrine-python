@@ -188,13 +188,13 @@ def test_get_project(collection, session):
     session.set_response({'project': project_data})
 
     # When
-    created_project = collection.get(project_data['uid'])
+    created_project = collection.get(project_data['id'])
 
     # Then
     assert 1 == session.num_calls
     expected_call = FakeCall(
         method='GET',
-        path='/projects/{}'.format(project_data['uid']),
+        path='/projects/{}'.format(project_data['id']),
     )
     assert expected_call == session.last_call
     assert 'single project' == created_project.name
@@ -281,5 +281,46 @@ def test_remove_member(project, session):
     expect_call = FakeCall(
         method="DELETE",
         path="/projects/{}/users/{}".format(project.uid, user["uid"])
+    )
+    assert expect_call == session.last_call
+
+
+def test_update(project, session):
+    # Given
+    name = "New Name"
+    project_data = ProjectDataFactory(name=name, id=str(project.uid))
+    session.set_response({"project": project_data})
+
+    # When
+    project = project.update(name=name)
+
+    # Then
+    print(project)
+    assert 1 == session.num_calls
+    expect_call = FakeCall(
+        method="PATCH",
+        path="/projects/{}".format(project.uid),
+        json={"name": name}
+    )
+    assert expect_call == session.last_call
+
+    # Also for description
+    description = "whatever"
+    project = project.update(description=description)
+    assert 2 == session.num_calls
+    expect_call = FakeCall(
+        method="PATCH",
+        path="/projects/{}".format(project.uid),
+        json={"description": description}
+    )
+    assert expect_call == session.last_call
+
+    # For both
+    project = project.update(description=description, name=name)
+    assert 3 == session.num_calls
+    expect_call = FakeCall(
+        method="PATCH",
+        path="/projects/{}".format(project.uid),
+        json={"description": description, "name": name}
     )
     assert expect_call == session.last_call

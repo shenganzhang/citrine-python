@@ -243,6 +243,30 @@ class Project(Resource['Project']):
         )
         return True
 
+    def update(self, name: Optional[str] = None, description: Optional[str] = None):
+        """
+        Update the Project on the server and return the updated version.
+
+        NOTE: The project will NOT mutate itself.
+
+        Value
+        -----
+
+        Returns
+        -------
+        Project
+            Returns the updated Project.
+        """
+        body = {}
+        if name is not None:
+            body["name"] = name
+        if description is not None:
+            body["description"] = description
+        response = self.session.checked_patch(self._path(), json=body)
+        project = Project.build(response["project"])
+        project.session = self.session  # attach existing session to new project
+        return project
+
 
 class ProjectCollection(Collection[Project]):
     """

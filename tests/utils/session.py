@@ -65,6 +65,10 @@ class FakeSession:
         self.calls.append(FakeCall('POST', path, json, params=kwargs.get('params')))
         return self.response
 
+    def checked_patch(self, path: str, json: dict, *args, **kwargs) -> dict:
+        self.calls.append(FakeCall('PATCH', path, json, params=kwargs.get('params')))
+        return self.response
+
     def checked_put(self, path: str, json: dict, *args, **kwargs) -> dict:
         self.calls.append(FakeCall('PUT', path, json))
         return self.response
