@@ -16,6 +16,7 @@ The only such mapping presently supported is :class:`~citrine.ara.rows.MaterialR
 .. code-block:: python
 
    from citrine.ara.rows import MaterialRunByTemplate
+   from taurus.entity.link_by_uid import LinkByUID
    row_def = MaterialRunByTemplate(
          templates=[LinkByUID(scope="templates", id="finished cookie")])
 
