@@ -366,6 +366,8 @@ class ProjectCollection(Collection[Project]):
         """
         return super().register(Project(name, description))
 
-    def delete(self, uuid):
-        """Delete the project with the provided uid."""
-        raise NotImplementedError("Delete is not supported for projects")
+    # def delete(self, uuid):
+    #     """Delete the project with the provided uid."""
+    #     # raise NotImplementedError("Delete is not supported for projects")
+    #
+    #     return super().delete(uuid)
