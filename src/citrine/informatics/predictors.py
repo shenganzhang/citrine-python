@@ -9,9 +9,9 @@ from citrine._session import Session
 from citrine.informatics.data_sources import DataSource
 from citrine.informatics.descriptors import Descriptor, FormulationDescriptor, RealDescriptor, \
     MolecularStructureDescriptor
+from citrine.informatics.modules import Module
 from citrine.informatics.reports import Report
 from citrine.resources.report import ReportResource
-from citrine.informatics.modules import Module
 
 __all__ = ['ExpressionPredictor',
            'GraphPredictor',
@@ -236,8 +236,8 @@ class ExpressionPredictor(Serializable['ExpressionPredictor'], Predictor):
     name = _properties.String('config.name')
     description = _properties.String('config.description')
     expression = _properties.String('config.expression')
-    output = _properties.Object(Descriptor, 'config.output')
-    aliases = _properties.Mapping(_properties.String, _properties.String, 'config.aliases')
+    output = _properties.Object(RealDescriptor, 'config.output')
+    aliases = _properties.Mapping(_properties.String, _properties.Object(RealDescriptor), 'config.aliases')
     typ = _properties.String('config.type', default='Expression', deserializable=False)
     status = _properties.Optional(_properties.String(), 'status', serializable=False)
     status_info = _properties.Optional(
@@ -255,16 +255,16 @@ class ExpressionPredictor(Serializable['ExpressionPredictor'], Predictor):
                  name: str,
                  description: str,
                  expression: str,
-                 output: Descriptor,
-                 aliases: dict,
+                 output: RealDescriptor,
+                 aliases: Dict[str, RealDescriptor],
                  session: Optional[Session] = None,
                  report: Optional[Report] = None,
                  active: bool = True):
         self.name: str = name
         self.description: str = description
         self.expression: str = expression
-        self.output: Descriptor = output
-        self.aliases: dict = aliases
+        self.output: RealDescriptor = output
+        self.aliases: Dict[str, RealDescriptor] = aliases
         self.session: Optional[Session] = session
         self.report: Optional[Report] = report
         self.active: bool = active
@@ -386,7 +386,7 @@ class MolecularStructureFeaturizer(Serializable['MolecularStructureFeaturizer'],
 
 
 class IngredientsToSimpleMixturePredictor(
-        Serializable['IngredientsToSimpleMixturePredictor'], Predictor):
+    Serializable['IngredientsToSimpleMixturePredictor'], Predictor):
     """[ALPHA] A predictor interface that constructs a simple mixture from ingredient quantities.
 
     Parameters
@@ -455,7 +455,7 @@ class IngredientsToSimpleMixturePredictor(
 
 
 class GeneralizedMeanPropertyPredictor(
-        Serializable['GeneralizedMeanPropertyPredictor'], Predictor):
+    Serializable['GeneralizedMeanPropertyPredictor'], Predictor):
     """[ALPHA] A predictor interface that computes generalized mean component properties.
 
     Parameters

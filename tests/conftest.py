@@ -1,4 +1,5 @@
 import uuid
+
 import pytest
 
 
@@ -160,6 +161,8 @@ def valid_expression_predictor_data():
     """Produce valid data used for tests."""
     from citrine.informatics.descriptors import RealDescriptor
     shear_modulus = RealDescriptor('Property~Shear modulus', lower_bound=0, upper_bound=100, units='GPa')
+    youngs_modulus = RealDescriptor('Property~Young\'s modulus', lower_bound=0, upper_bound=100, units='GPa')
+    poissons_ratio = RealDescriptor('Property~Poisson\'s ratio', lower_bound=-1, upper_bound=0.5, units='')
     return dict(
         module_type='PREDICTOR',
         status='VALID',
@@ -175,8 +178,8 @@ def valid_expression_predictor_data():
             expression='Y / (2 * (1 + v))',
             output=shear_modulus.dump(),
             aliases={
-                "Property~Young's modulus": 'Y',
-                "Property~Poisson's ratio": 'v',
+                'Y': youngs_modulus.dump(),
+                'v': poissons_ratio.dump(),
             }
         )
     )
@@ -324,6 +327,7 @@ def valid_label_fractions_predictor_data():
         )
     )
 
+
 @pytest.fixture
 def valid_ingredient_fractions_predictor_data():
     """Produce valid data used for tests."""
@@ -370,6 +374,7 @@ def invalid_predictor_data():
         )
     )
 
+
 @pytest.fixture
 def valid_grid_processor_data():
     """Valid GridProcessor data."""
@@ -414,7 +419,6 @@ def valid_enumerated_processor_data():
 def valid_simple_mixture_predictor_data():
     """Produce valid data used for tests."""
     from citrine.informatics.data_sources import AraTableDataSource
-    from citrine.informatics.descriptors import RealDescriptor
     return dict(
         module_type='PREDICTOR',
         status='VALID',

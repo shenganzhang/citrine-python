@@ -1,7 +1,8 @@
 """Tests for citrine.informatics.processors."""
+import uuid
+
 import mock
 import pytest
-import uuid
 
 from citrine.informatics.data_sources import AraTableDataSource
 from citrine.informatics.descriptors import RealDescriptor, MolecularStructureDescriptor, FormulationDescriptor
@@ -13,6 +14,8 @@ x = RealDescriptor("x", 0, 100, "")
 y = RealDescriptor("y", 0, 100, "")
 z = RealDescriptor("z", 0, 100, "")
 shear_modulus = RealDescriptor('Property~Shear modulus', lower_bound=0, upper_bound=100, units='GPa')
+youngs_modulus = RealDescriptor('Property~Young\'s modulus', lower_bound=0, upper_bound=100, units='GPa')
+poissons_ratio = RealDescriptor('Property~Poisson\'s ratio', lower_bound=-1, upper_bound=0.5, units='')
 formulation = FormulationDescriptor('formulation')
 formulation_output = FormulationDescriptor('output formulation')
 water_quantity = RealDescriptor('water quantity', 0, 1)
@@ -53,12 +56,12 @@ def expression_predictor() -> ExpressionPredictor:
     """Build an ExpressionPredictor for testing."""
     return ExpressionPredictor(
         name='Expression predictor',
-        description='Computes shear modulus from Youngs modulus and Poissons ratio',
+        description='Computes shear modulus from Young\'s modulus and Poisson\'s ratio',
         expression='Y / (2 * (1 + v))',
         output=shear_modulus,
         aliases={
-            'Y': "Property~Young's modulus",
-            'v': "Property~Poisson's ratio"
+            'Y': youngs_modulus,
+            'v': poissons_ratio
         })
 
 
@@ -180,9 +183,9 @@ def test_graph_post_build(graph_predictor):
 def test_expression_initialization(expression_predictor):
     """Make sure the correct fields go to the correct places for an expression predictor."""
     assert expression_predictor.name == 'Expression predictor'
-    assert expression_predictor.output.key == 'Property~Shear modulus'
+    assert expression_predictor.output == shear_modulus
     assert expression_predictor.expression == 'Y / (2 * (1 + v))'
-    assert expression_predictor.aliases == {'Y': "Property~Young's modulus", 'v': "Property~Poisson's ratio"}
+    assert expression_predictor.aliases == {'Y': youngs_modulus, 'v': poissons_ratio}
     assert str(expression_predictor) == '<ExpressionPredictor \'Expression predictor\'>'
 
 
