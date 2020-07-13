@@ -2,6 +2,8 @@ from citrine.exceptions import NotFound
 from citrine.resources import ProjectCollection
 from citrine.resources.dataset import Dataset
 
+from logging import getLogger
+logger = getLogger(__name__)
 
 def find_collection(collection, name):
     """
@@ -9,7 +11,7 @@ def find_collection(collection, name):
 
     Returns it, or if not found, returns None
     """
-    print("finding {} collection. name is {}".format(collection.__class__.__name__, name))
+    logger.warning("finding {} collection. name is {}".format(collection.__class__.__name__, name))
     if isinstance(collection, ProjectCollection):
         try:
             # try to use search if it is available
