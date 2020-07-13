@@ -9,6 +9,7 @@ def find_collection(collection, name):
 
     Returns it, or if not found, returns None
     """
+    print("finding {} collection. name is {}".format(collection.__class__.__name__, name))
     if isinstance(collection, ProjectCollection):
         try:
             # try to use search if it is available
