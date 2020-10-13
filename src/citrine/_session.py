@@ -124,7 +124,7 @@ class Session(requests.Session):
 
         response = self._request_with_retry(method, uri, **kwargs)
 
-        logger.debug('Elapsed time for request: {} s'.format(response.elapsed.total_seconds()))
+        print('Elapsed time for request: {} s'.format(response.elapsed.total_seconds()))
 
         try:
             if response.status_code == 401 and response.json().get("reason") == "invalid-token":
