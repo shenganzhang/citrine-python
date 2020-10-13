@@ -28,9 +28,9 @@ def find_collection(collection, name):
             }))
         except NotFound:
             # Search must not be available yet
-            collection_list = collection.list()
+            collection_list = collection.list(per_page=1000)
     else:
-        collection_list = collection.list()
+        collection_list = collection.list(per_page=1000)
     matching_resources = [resource for resource in collection_list if resource.name == name]
     if len(matching_resources) > 1:
         raise ValueError("Found multiple collections with name '{}'".format(name))
