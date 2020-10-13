@@ -41,6 +41,7 @@ class DescriptorMethods:
                 'inputs': [i.dump() for i in inputs]
             }
         )
+        print(response)
         return [Descriptor.build(r) for r in response['responses']]
 
     def descriptors_from_data_source(self, data_source: DataSource) -> List[Descriptor]:
