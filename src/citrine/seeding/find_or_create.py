@@ -9,12 +9,22 @@ from copy import deepcopy
 from typing import Union
 
 
-def find_collection(collection, name):
+def find_collection(collection, name, per_page=None):
     """
     Looks through the pages of a collection for a resource with the specified name.
 
-    Returns it, or if not found, returns None
+    Returns it, or if not found, returns None.  The optional per_page argument can
+    be supplied to increase the number of records per page.  Increasing this value
+    from the default can decrease the number of API calls and potentially increase
+    performance.
     """
+
+    # Using the default keyword arguments for collection.list() unless per_page
+    # is specified.
+    list_kwargs = {}
+    if per_page is not None:
+        list_kwargs['per_page'] = int(per_page)
+
     if isinstance(collection, ProjectCollection):
         try:
             # try to use search if it is available
@@ -28,9 +38,9 @@ def find_collection(collection, name):
             }))
         except NotFound:
             # Search must not be available yet
-            collection_list = collection.list(per_page=1000)
+            collection_list = collection.list(**list_kwargs)
     else:
-        collection_list = collection.list(per_page=1000)
+        collection_list = collection.list(**list_kwargs)
     matching_resources = [resource for resource in collection_list if resource.name == name]
     if len(matching_resources) > 1:
         raise ValueError("Found multiple collections with name '{}'".format(name))
