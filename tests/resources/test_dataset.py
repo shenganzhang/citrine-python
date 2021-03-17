@@ -570,27 +570,38 @@ def test_delete_missing_uid(dataset):
 def test_batch_delete(dataset):
     from citrine.resources.delete import DELETE_SERVICE_MAX
 
-    failure_resp = {'failures': [
-        {
-            "id":{
-                'scope': 'somescope',
-                'id': 'abcd-1234'
-            },
-            'cause': {
-                "code": 400,
-                "message": "",
-                "validation_errors": [
-                    {
-                        "failure_message": "fail msg",
-                        "failure_id": "identifier.coreid.missing"
+    job_resp = {
+        'job_id': '1234'
+    }
+
+    failed_job_resp = {
+        'job_type': 'batch_delete',
+        'status': 'Success',
+        'tasks': [],
+        'output': {
+            'failures': [
+                {
+                    "id":{
+                        'scope': 'somescope',
+                        'id': 'abcd-1234'
+                    },
+                    'cause': {
+                        "code": 400,
+                        "message": "",
+                        "validation_errors": [
+                            {
+                                "failure_message": "fail msg",
+                                "failure_id": "identifier.coreid.missing"
+                            }
+                        ]
                     }
-                ]
-            }
+                }
+            ]
         }
-    ]}
+    }
 
     session = dataset.session
-    session.set_responses(failure_resp, failure_resp, failure_resp)
+    session.set_responses(job_resp, failed_job_resp, job_resp, failed_job_resp)
 
     # When
     del_resp = dataset.gemd_batch_delete([uuid.UUID(
@@ -600,7 +611,7 @@ def test_batch_delete(dataset):
     assert 1 == session.num_calls
     expect_call = FakeCall(
         method="POST",
-        path="/projects/{}/gemd/batch-delete".format(dataset.project_id)
+        path="/projects/{}/gemd/async-batch-delete".format(dataset.project_id)
     )
     assert expect_call.method == session.last_call.method
     assert expect_call.path == session.last_call.path
@@ -631,7 +642,7 @@ def test_batch_delete(dataset):
     assert first_failure == (LinkByUID('somescope', 'abcd-1234'), expected_api_error)
 
     # And again with Base Entities
-    responses = [failure_resp]*4
+    responses = [job_resp, failed_job_resp]*4
     session.set_responses(*responses)
     targets = []
     for i in range(DELETE_SERVICE_MAX):

@@ -18,7 +18,7 @@ from citrine._serialization.properties import String, Object, Integer
 from citrine._serialization.serializable import Serializable
 from citrine._session import Session
 from citrine._utils.functions import write_file_locally
-from citrine.resources.job import JobSubmissionResponse
+from citrine.resources.job import JobSubmissionResponse, _poll_for_job_completion
 from citrine.resources.response import Response
 from gemd.entity.bounds.base_bounds import BaseBounds
 from gemd.entity.file_link import FileLink as GEMDFileLink
@@ -479,7 +479,7 @@ class FileCollection(Collection[FileLink]):
 
         """
         # Poll for job completion - this will raise an error if the job failed
-        self._poll_for_job_completion(self.project_id, job_id, timeout=timeout,
+        _poll_for_job_completion(self.session, self.project_id, job_id, timeout=timeout,
                                       polling_delay=polling_delay)
 
         return self.file_processing_result(file_link, [processing_type])

@@ -11,6 +11,7 @@ from citrine._utils.functions import scrub_none
 from citrine.exceptions import NotFound
 from citrine.resources.api_error import ApiError
 from citrine.resources.condition_template import ConditionTemplateCollection
+from citrine.resources.delete import _async_gemd_batch_delete
 from citrine.resources.file_link import FileCollection
 from citrine.resources.ingredient_run import IngredientRunCollection
 from citrine.resources.ingredient_spec import IngredientSpecCollection
@@ -289,8 +290,13 @@ class Dataset(Resource['Dataset']):
         return self._collection_for(data_concepts_resource) \
             .delete(uid[1], scope=uid[0], dry_run=dry_run)
 
-    def gemd_batch_delete(self, id_list: List[Union[LinkByUID, UUID, str, BaseEntity]]) -> \
-            List[Tuple[LinkByUID, ApiError]]:
+    def gemd_batch_delete(
+            self,
+            id_list: List[Union[LinkByUID, UUID, str, BaseEntity]],
+            *,
+            timeout: float = 2 * 60,
+            polling_delay: float = 1.0
+    ) -> List[Tuple[LinkByUID, ApiError]]:
         """
         Remove a set of GEMD objects.
 
@@ -325,8 +331,8 @@ class Dataset(Resource['Dataset']):
             deleted.
 
         """
-        from citrine.resources.delete import _gemd_batch_delete
-        return _gemd_batch_delete(id_list, self.project_id, self.session, self.uid)
+        return _async_gemd_batch_delete(id_list, self.project_id, self.session, self.uid,
+                                        timeout=timeout, polling_delay=polling_delay)
 
 
 class DatasetCollection(Collection[Dataset]):
