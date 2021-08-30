@@ -41,17 +41,14 @@ class GemTable(Resource['Table']):
     """:str: URL pointing to the location of the GEM Table's contents.
     This is an expiring download link and is not unique."""
 
+    config = properties.Object(TableConfig, "config")
+
     def __init__(self):
         self._project_id = None
         self._session = None
 
     def __str__(self):
         return '<GEM Table {!r}, version {}>'.format(self.uid, self.version)
-
-    def config(self):
-        path = GemTableCollection(self._project_id, self._session)._get_path(self.uid) + format_escaped_url("/versions/{}/definition", self.version)
-        data = self._session.get_resource(path)
-        return TableConfigCollection(self._project_id, self._session).build(data)
 
 
 class GemTableVersionPaginator(Paginator[GemTable]):
@@ -83,11 +80,45 @@ class GemTableCollection(Collection[GemTable]):
         if version is not None:
             path = self._get_path(uid) + format_escaped_url("/versions/{}", version)
             data = self.session.get_resource(path)
+            config_path = self._get_path(uid) + format_escaped_url("/versions/{}/definition", version)
+            config = self.session.get_resource(config_path)
+            data["config"] = config["version"]["ara_definition"]
             return self.build(data)
         else:
             tables = self.list_versions(uid)
             newest_table = max(tables, key=lambda x: x.version or 0)
             return newest_table
+
+    def list(self, *,
+             page: Optional[int] = None,
+             per_page: int = 100) -> Iterable[GemTable]:
+        """
+        List the versions of a table given a specific Table UID.
+
+        This is a paginated collection, similar to a .list() call.
+
+
+        :param uid: The Table UID.
+        :param page: The page number to display (eg: 1)
+        :param per_page: The number of items to fetch per-page.
+        :return: An iterable of the versions of the Tables (as Table objects).
+        """
+        def _fetch_versions(page: Optional[int],
+                            per_page: int) -> Tuple[Iterable[dict], str]:
+            data = self.session.get_resource(self._get_path() + "/latest",
+                                             params=self._page_params(page, per_page))
+            return data['entries'], data.get('next', "")
+
+        def _build_versions(collection: Iterable[dict]) -> Iterable[GemTable]:
+            for item in collection:
+                table_data = item["table"]
+                config_data = item["table_config"]
+                table_data["config"] = config_data
+                yield self.build(table_data)
+
+        return self._paginator.paginate(
+            # Don't deduplicate on uid since uids are shared between versions
+            _fetch_versions, _build_versions, page, per_page, deduplicate=False)
 
     def list_versions(self,
                       uid: UUID,
@@ -113,6 +144,10 @@ class GemTableCollection(Collection[GemTable]):
 
         def _build_versions(collection: Iterable[dict]) -> Iterable[GemTable]:
             for item in collection:
+                version = item["version"]
+                config_path = self._get_path(uid) + format_escaped_url("/versions/{}/definition", version)
+                config = self.session.get_resource(config_path)
+                item["config"] = config["version"]["ara_definition"]
                 yield self.build(item)
 
         return self._paginator.paginate(
@@ -135,6 +170,8 @@ class GemTableCollection(Collection[GemTable]):
         :param per_page: The number of items to fetch per-page.
         :return: An iterable of the versions of the Tables (as Table objects).
         """
+        config = TableConfigCollection(project_id=self.project_id, session=self.session).get(table_config_uid)
+
         def _fetch_versions(page: Optional[int],
                             per_page: int) -> Tuple[Iterable[dict], str]:
             path_params = {'table_config_uid_str': str(table_config_uid)}
@@ -150,6 +187,7 @@ class GemTableCollection(Collection[GemTable]):
 
         def _build_versions(collection: Iterable[dict]) -> Iterable[GemTable]:
             for item in collection:
+                item["config"] = config.dump()
                 yield self.build(item)
 
         return self._paginator.paginate(
